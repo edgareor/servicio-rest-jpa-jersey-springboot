@@ -8,47 +8,38 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.validation.Valid;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import paquete.spring.entity.InterfacePersonasDAO;
 import paquete.spring.entity.Persona;
 
 @Component
 @Transactional
-//@Api(tags="gestion-personas")
+
 @Path("/clase-service")
 public class ServicioRest {
 	
 	@Autowired
 	InterfacePersonasDAO dao;
 
-	//@ApiOperation(value="Retorna Fecha Actual")
-	//@ApiResponses( value = {
-	//			@ApiResponse(code=201, message="Aceptado"),
-	//			@ApiResponse(code=432, message="Inventado"),
-	//		})
 	@GET
 	@Path("/timenow")
 	@Produces({"application/json"})
@@ -72,25 +63,29 @@ public class ServicioRest {
 		
 		Map<String, Object> collection = new HashMap<String, Object>();
 		
-		collection.put("Header", headers.getVary());
+		// String var = headers.getHeaderString("message");
+		
+		collection.put("Headers:", headers.getRequestHeaders().toString());	// Se usa el metodo .getRequestHeaders() para extraer los headers, y el toString() para que los transforme a un String y que cada header no sea un objeto y le coloque un [] a cada valor de key. 
 
          	return collection;
 	}
-	/*
-	@GetMapping(value="/httpentity", produces="application/json")
-	public ResponseEntity<Map<String, String>> getEntity() {
-		
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("value1", "Hola");
-		headers.add("value2", "Mundo");
-		
+	
+	@GET
+	@Path("/response-header")
+	@Produces({"application/json"})
+	public Response responseHeaders() {
+
 		Map<String, String> collection = new HashMap<String, String>();
-		collection.put("Respuesta", "Respuesta desde metodo GET http-entity");
+		collection.put("Response", "Respuesta desde metodo GET que envie un Header de respuesta");
+		
+			//Response.status(Response.Status.ACCEPTED).header("Message", "Response Header").entity(collection).build();
 
-         	return ResponseEntity.status(HttpStatus.OK).headers(headers).body(collection);
+         	return Response.status(202).header("Message", "Response Header").entity(collection).build();
 	}
-
-	@GetMapping(path="/personas", produces="application/json")
+	
+	@GET
+	@Path("/personas")
+	@Produces({"application/json"})
 	public Map<String, List<Persona>> extraerAll() {
 		
 		Map<String, List<Persona>> collection = new HashMap<String, List<Persona>>();
@@ -101,7 +96,6 @@ public class ServicioRest {
 		return collection;
 		
 	}
-	*/
 	
 	/*
 	@GetMapping(path="/personas-procedure/{arg}", produces="application/json")
@@ -116,16 +110,19 @@ public class ServicioRest {
 	}
 	*/
 	
-	/*
-	@GetMapping(path="/personas-desc", produces="application/json")
+	@GET
+	@Path("/personas-desc")
+	@Produces({"application/json"})
 	public List<Persona> extraerAllDesc() {
 	
 		List<Persona> lista = dao.findAllOrderDesc();
 
 		return lista;
 	}
-	
-	@GetMapping(path="/personas-asc", produces="application/json")
+
+	@GET
+	@Path("/personas-asc")
+	@Produces({"application/json"})
 	public List<Persona> extraerAllAsc() {
 	
 		List<Persona> lista = dao.findAllOrderAsc();
@@ -133,7 +130,9 @@ public class ServicioRest {
 		return lista;
 	}
 	
-	@GetMapping(path="/contar-id", produces="application/json")
+	@GET
+	@Path("/contar-id")
+	@Produces({"application/json"})
 	public Map<String, Long> contarById() {
 	
 		long num = dao.count();
@@ -144,8 +143,10 @@ public class ServicioRest {
      	return collection;
 	}
 	
-	@GetMapping(path="/contar-name/{name}", produces="application/json")
-	public Map<String, Long> contarByName(@PathVariable String name) {
+	@GET
+	@Path("/contar-name/{name}")
+	@Produces({"application/json"})
+	public Map<String, Long> contarByName(@PathParam("name") String name) {
 	
 		long num = dao.countByNombre(name);
 		
@@ -155,8 +156,10 @@ public class ServicioRest {
      	return collection;
 	}
 	
-	@GetMapping(path="/personas-name/{name}", produces="application/json")
-	public Map<String, List<Persona>> extraerPorName(@PathVariable String name) {
+	@GET
+	@Path("/personas-name/{name}")
+	@Produces({"application/json"})
+	public Map<String, List<Persona>> extraerPorName(@PathParam("name") String name) {
 	
 		List<Persona> per = dao.findByName(name);
 		
@@ -166,8 +169,10 @@ public class ServicioRest {
 			return collection;
 	}
 	
-	@GetMapping(path="/personas-id/{id}", produces="application/json")
-	public Map<String, Persona> extraerPorId(@PathVariable long id) {
+	@GET
+	@Path("/personas-id/{id}")
+	@Produces({"application/json"})
+	public Map<String, Persona> extraerPorId(@PathParam("id") long id) {
 	
 		Optional<Persona> per = dao.findById(id);
 		
@@ -177,8 +182,10 @@ public class ServicioRest {
 			return collection;
 	}
 	
-	@GetMapping(path="/personas-id", produces="application/json")
-	public Map<String, Persona> extraerPorIdParam(@RequestParam long id) {
+	@GET
+	@Path("/personas-id")
+	@Produces({"application/json"})
+	public Map<String, Persona> extraerPorIdParam(@QueryParam("id") long id) {
 	
 		Optional<Persona> per = dao.findById(id);
 		
@@ -188,8 +195,11 @@ public class ServicioRest {
 			return collection;
 	}
 	
-	@PostMapping(path="/personas", consumes="application/json", produces="application/json")
-	public Map<String, String> ingresar(@RequestBody Persona per) {
+	@POST
+	@Path("/personas")
+	@Consumes({"application/json"})
+	@Produces({"application/json"})
+	public Map<String, String> ingresar(Persona per) {
 		
 		if (per.getPersonaId()==0) {
 			long count = dao.count();  // Tener en cuenta que si existe un registro con id = 0, no se deberia incrementar en uno, debido a que arrojaria uno de mas porque cuenta el registro 0.
@@ -204,8 +214,11 @@ public class ServicioRest {
 		return collection;
 	}
 	
-	@PutMapping(path="/personas", consumes="application/json", produces="application/json")
-	public Map<String, String> modificar(@Valid @RequestBody Persona per) {  // NOTA: No se puede modificar el ID de la persona, el resto de atributos si.
+	@PUT
+	@Path("/personas")
+	@Consumes({"application/json"})
+	@Produces({"application/json"})
+	public Map<String, String> modificar(Persona per) {  // NOTA: No se puede modificar el ID de la persona, el resto de atributos si.
 		
 		Map<String, String> collection = new HashMap<String, String>();
 
@@ -218,8 +231,11 @@ public class ServicioRest {
 		return collection;
 	}
 	
-	@DeleteMapping(path="/personas", produces="application/json")
-	public Map<String,String> eliminar(@RequestBody Persona per) {
+	@DELETE
+	@Path("/personas")
+	@Consumes({"application/json"})
+	@Produces({"application/json"})
+	public Map<String,String> eliminar(Persona per) {
 		
 		dao.delete(per);
 		Map<String,String> col = new HashMap<String,String>();
@@ -227,8 +243,10 @@ public class ServicioRest {
 		return col;
 	}
 	
-	@DeleteMapping(path="/personas-apellido/{apellido}", produces="application/json")
-	public Map<String,String> eliminarByApellido(@PathVariable String apellido) {
+	@DELETE
+	@Path("/personas-apellido/{apellido}")
+	@Produces({"application/json"})
+	public Map<String,String> eliminarByApellido(@PathParam("apellido") String apellido) {
 		
 		dao.deleteByApellido(apellido);
 		Map<String,String> col = new HashMap<String,String>();
@@ -236,13 +254,15 @@ public class ServicioRest {
 		return col;
 	}
 	
-	@DeleteMapping(path="/personas-id/{id}", produces="application/json")
-	public Map<String,String> eliminarById(@PathVariable long id) {
+	@DELETE
+	@Path("/personas-id/{id}")
+	@Produces({"application/json"})
+	public Map<String,String> eliminarById(@PathParam("id") long id) {
 	
 		dao.deleteById(id);
 		Map<String,String> col = new HashMap<String,String>();
 		col.put("Respuesta", "Entidad eliminada correctamente");
 		return col;
 	}
-	*/
+
 }
