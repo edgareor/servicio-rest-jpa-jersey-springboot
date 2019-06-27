@@ -68,13 +68,13 @@ public class ServicioRest {
 	@GET
 	@Path("/imprime-header")
 	@Produces({"application/json"})
-	public Map<String, Object> getHeader(@Context HttpHeaders headers) {
+	public Map<String, String> getHeader(@Context HttpHeaders headers) {
 		
-		Map<String, Object> collection = new HashMap<String, Object>();
+		//Map<String, Object> collection = new HashMap<String, Object>();
 		
-		collection.put("Header", headers.getVary());
+		//collection.put("Header", headers.get("message"));
 
-         	return collection;
+         	return headers.toSingleValueMap();
 	}
 	/*
 	@GetMapping(value="/httpentity", produces="application/json")
