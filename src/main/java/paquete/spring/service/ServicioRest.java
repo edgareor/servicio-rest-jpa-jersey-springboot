@@ -25,17 +25,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import paquete.spring.entity.InterfaceNumeroDAO;
 import paquete.spring.entity.InterfacePersonasDAO;
 import paquete.spring.entity.Persona;
+import paquete.spring.entity.StoreProcedureDAO;
 
 @Component
 @Transactional
 
-@Path("/clase-service")
+@Path("/api")
 public class ServicioRest {
 	
 	@Autowired
 	InterfacePersonasDAO dao;
+	
+	@Autowired
+	InterfaceNumeroDAO dao2;
+	
+	@Autowired
+	StoreProcedureDAO dao3;
 
 	@GET
 	@Path("/timenow")
@@ -93,19 +101,6 @@ public class ServicioRest {
 		return collection;
 		
 	}
-	
-	/*
-	@GetMapping(path="/personas-procedure/{arg}", produces="application/json")
-	public Map<String, Integer> extraerPorRut(@PathVariable int arg) {
-		
-		Map<String, Integer> collection = new HashMap<String, Integer>();
-	
-		int lista = dao.callProcedure(arg);
-		collection.put("Data", lista);
-
-		return collection;
-	}
-	*/
 	
 	@GET
 	@Path("/personas-desc")
@@ -260,6 +255,35 @@ public class ServicioRest {
 		Map<String,String> col = new HashMap<String,String>();
 		col.put("Respuesta", "Entidad eliminada correctamente");
 		return col;
+	}
+	
+	@GET
+	@Path("/procedure/{rut}")
+	@Produces({ "application/json" })
+	public Response getFunction(@PathParam("rut") String x) {
+		
+		Map<String, String> collection = new HashMap<String, String>();
+		
+		String result = dao3.callProcedure(x);
+		
+		collection.put("message", result);
+		
+		return Response.ok().entity(collection).build();
+	}
+	
+
+	@GET
+	@Path("/function/{x}/{y}")
+	@Produces({ "application/json" })
+	public Response getFunction(@PathParam("x") int x, @PathParam("y") int y) {
+		
+		Map<String, Integer> collection = new HashMap<String, Integer>();
+		
+		int result = dao2.callHelloWorld(x, y);
+		
+		collection.put("result", result);
+		
+		return Response.ok().entity(collection).build();
 	}
 
 }

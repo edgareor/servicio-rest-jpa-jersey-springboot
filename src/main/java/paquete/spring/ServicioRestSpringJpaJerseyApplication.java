@@ -9,5 +9,4 @@ public class ServicioRestSpringJpaJerseyApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ServicioRestSpringJpaJerseyApplication.class, args);
 	}
-
 }
